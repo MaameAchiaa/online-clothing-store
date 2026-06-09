@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>UrbanModa | Interactive Clothing Store</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">URBAN<span>MODA</span></div>
+    <div class="nav-links">
+        <a href="#" data-category="all">Shop</a>
+        <a href="#" data-category="men">Men</a>
+        <a href="#" data-category="women">Women</a>
+        <a href="#" data-category="accessories">Accessories</a>
+        <div class="cart-icon" id="cartIconBtn">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-count" id="cartCountBadge">0</span>
+        </div>
+    </div>
+</div>
+
+<section class="hero">
+    <h1>Elevate your everyday style</h1>
+    <p>Contemporary clothing with timeless quality — fresh arrivals every week</p>
+</section>
+
+<div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="men">Men</button>
+    <button class="filter-btn" data-filter="women">Women</button>
+    <button class="filter-btn" data-filter="accessories">Accessories</button>
+</div>
+
+<section class="products-section">
+    <div class="section-title">Latest Collection</div>
+    <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<footer>
+    <p>© 2025 UrbanModa — interactive clothing store | free shipping on orders over $75</p>
+</footer>
+
+<!-- Cart Sidebar -->
+<div class="cart-overlay" id="cartOverlay">
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h3><i class="fas fa-shopping-bag"></i> Your Cart</h3>
+            <span class="close-cart" id="closeCartBtn">&times;</span>
+        </div>
+        <div class="cart-items" id="cartItemsList">
+            <div style="text-align:center; color:#aaa;">Your cart is empty</div>
+        </div>
+        <div class="cart-total">
+            <span>Total</span>
+            <span id="cartTotalPrice">$0.00</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">Checkout <i class="fas fa-arrow-right"></i></button>
+    </div>
+</div>
+
+<div id="toastMsg" class="toast-msg">Item added to cart</div>
+
+<!-- Custom JavaScript -->
+<script src="js/script.js"></script>
+</body>
+</html>
