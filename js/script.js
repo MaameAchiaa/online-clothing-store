@@ -1,18 +1,18 @@
 
 // ---------- PRODUCT DATABASE ----------
 const products = [
-    { id: 1, name: "Oversized Linen Shirt", category: "men", price: 59.99, image: "", gender: "men" },
-    { id: 2, name: "Slim Fit Chino Pants", category: "men", price: 79.99, image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400", gender: "men" },
-    { id: 3, name: "Classic Bomber Jacket", category: "men", price: 129.99, image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400", gender: "men" },
-    { id: 4, name: "Silk Midi Dress", category: "women", price: 89.99, image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400", gender: "women" },
-    { id: 5, name: "Cropped Cashmere Sweater", category: "women", price: 109.99, image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400", gender: "women" },
-    { id: 6, name: "Wide Leg Trousers", category: "women", price: 74.99, image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400", gender: "women" },
-    { id: 7, name: "Leather Crossbody Bag", category: "accessories", price: 49.99, image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400", gender: "accessories" },
-    { id: 8, name: "Minimalist Watch", category: "accessories", price: 89.99, image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400", gender: "accessories" },
-    { id: 9, name: "Aviator Sunglasses", category: "accessories", price: 39.99, image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400", gender: "accessories" },
-    { id: 10, name: "Merino Wool Beanie", category: "accessories", price: 29.99, image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400", gender: "accessories" },
-    { id: 11, name: "Relaxed Denim Jacket", category: "men", price: 99.99, image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400", gender: "men" },
-    { id: 12, name: "Floral Maxi Dress", category: "women", price: 119.99, image: "https://images.unsplash.com/photo-15980328953 ninety-seven-b-nine-four-seven-two-four-four-four-bf-nine-three?w=400", gender: "women" }
+    { id: 1, name: "Oversized Linen Shirt", category: "men", price: 59.99, image: "images/men/linen-shirt.jpeg", gender: "men" },
+    { id: 2, name: "Slim Fit Chino Pants", category: "men", price: 79.99, image: "images/men/slim-fit pant.jpeg", gender: "men" },
+    { id: 3, name: "Classic Bomber Jacket", category: "men", price: 129.99, image: "images/men/classic bomber jacket.jpeg", gender: "men" },
+    { id: 4, name: "Silk Midi Dress", category: "women", price: 89.99, image: "images/men/women/silk midi dress.jpeg", gender: "women" },
+    { id: 5, name: "Cropped Cashmere Sweater", category: "women", price: 109.99, image: "images/men/women/Cropped Cashmere Sweater.avif", gender: "women" },
+    { id: 6, name: "Wide Leg Trousers", category: "women", price: 74.99, image: "images/men/women/wide leg trouser.webp", gender: "women" },
+    { id: 7, name: "Leather Crossbody Bag", category: "accessories", price: 49.99, image: "images/men/accessories/leather crossbody bag.jpeg", gender: "accessories" },
+    { id: 8, name: "Minimalist Watch", category: "accessories", price: 89.99, image: "images/men/accessories/minimalist watch.jpg", gender: "accessories" },
+    { id: 9, name: "Aviator Sunglasses", category: "accessories", price: 39.99, image: "images/men/accessories/aviator sunglass.jpg", gender: "accessories" },
+    { id: 10, name: "Merino Wool Beanie", category: "accessories", price: 29.99, image: "images/men/accessories/merino wool.webp", gender: "accessories" },
+    { id: 11, name: "Relaxed Denim Jacket", category: "men", price: 99.99, image: "images/men/Denim jacket.webp", gender: "men" },
+    { id: 12, name: "Floral Maxi Dress", category: "women", price: 119.99, image: "images/men/women/floral dress.webp", gender: "women" }
 ];
 
 // Cart state
