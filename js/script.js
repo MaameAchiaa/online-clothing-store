@@ -68,9 +68,13 @@ function updateCartUI() {
         const prod = item.product;
         const itemTotal = prod.price * item.quantity;
         total += itemTotal;
+        const cartImage = prod.image
+            ? `<img src="${prod.image}" alt="${prod.name}" class="cart-thumb-image">`
+            : `<i class="fas fa-tag"></i>`;
+
         html += `
             <div class="cart-item" data-cartindex="${idx}">
-                <div class="cart-item-img">${prod.icon}</div>
+                <div class="cart-item-img">${cartImage}</div>
                 <div class="cart-item-details">
                     <div class="cart-item-title">${prod.name}</div>
                     <div class="cart-item-price">$${prod.price.toFixed(2)}</div>
