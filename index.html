@@ -2,13 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>MAAME'S CLOTHING LINE | Premium Ghanaian Fashion</title>
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -20,10 +17,17 @@
         <a href="#" data-category="men">Men</a>
         <a href="#" data-category="women">Women</a>
         <a href="#" data-category="accessories">Accessories</a>
-        <div class="cart-icon" id="cartIconBtn">
-            <i class="fas fa-shopping-bag"></i>
-            <span class="cart-count" id="cartCountBadge">0</span>
-        </div>
+        <div class="search-icon" id="searchIconBtn"><i class="fas fa-search"></i></div>
+        <div class="wishlist-icon" id="wishlistIconBtn"><i class="far fa-heart"></i><span class="wishlist-count" id="wishlistCountBadge">0</span></div>
+        <div class="cart-icon" id="cartIconBtn"><i class="fas fa-shopping-bag"></i><span class="cart-count" id="cartCountBadge">0</span></div>
+    </div>
+</div>
+
+<div class="search-bar" id="searchBar">
+    <div class="search-container">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search for clothes, accessories...">
+        <button id="closeSearchBtn"><i class="fas fa-times"></i></button>
     </div>
 </div>
 
@@ -46,127 +50,81 @@
 
 <footer>
     <p>© 2026 MAAME'S CLOTHING LINE — Free delivery across Ghana on orders over GH₵500</p>
+    <div class="social-links">
+        <i class="fab fa-facebook"></i>
+        <i class="fab fa-instagram"></i>
+        <i class="fab fa-twitter"></i>
+        <i class="fab fa-whatsapp"></i>
+    </div>
 </footer>
 
 <!-- Cart Sidebar -->
 <div class="cart-overlay" id="cartOverlay">
     <div class="cart-sidebar">
-        <div class="cart-header">
-            <h3><i class="fas fa-shopping-bag"></i> Your Cart</h3>
-            <span class="close-cart" id="closeCartBtn">&times;</span>
-        </div>
-        <div class="cart-items" id="cartItemsList">
-            <div style="text-align:center; color:#aaa;">Your cart is empty</div>
-        </div>
-        <div class="cart-total">
-            <span>Subtotal</span>
-            <span id="cartSubtotal">GH₵0.00</span>
-        </div>
-        <div class="delivery-fee" style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.9rem; color: #6b5a4a;">
-            <span>Delivery (Nationwide)</span>
-            <span id="deliveryFee">GH₵0.00</span>
-        </div>
-        <div class="cart-total" style="margin-top: 0.5rem;">
-            <span>Total</span>
-            <span id="cartTotalPrice">GH₵0.00</span>
-        </div>
+        <div class="cart-header"><h3><i class="fas fa-shopping-bag"></i> Your Cart</h3><span class="close-cart" id="closeCartBtn">&times;</span></div>
+        <div class="cart-items" id="cartItemsList"><div style="text-align:center; color:#aaa;">Your cart is empty</div></div>
+        <div class="cart-total"><span>Subtotal</span><span id="cartSubtotal">GH₵0.00</span></div>
+        <div class="delivery-fee"><span>Delivery (Nationwide)</span><span id="deliveryFee">GH₵0.00</span></div>
+        <div class="cart-total" style="margin-top: 0.5rem;"><span>Total</span><span id="cartTotalPrice">GH₵0.00</span></div>
         <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout <i class="fas fa-arrow-right"></i></button>
+    </div>
+</div>
+
+<!-- Wishlist Sidebar -->
+<div class="wishlist-overlay" id="wishlistOverlay">
+    <div class="wishlist-sidebar">
+        <div class="wishlist-header"><h3><i class="fas fa-heart"></i> Your Wishlist</h3><span class="close-wishlist" id="closeWishlistBtn">&times;</span></div>
+        <div class="wishlist-items" id="wishlistItemsList"><div style="text-align:center; color:#aaa;">Your wishlist is empty</div></div>
     </div>
 </div>
 
 <!-- Checkout Modal -->
 <div class="checkout-modal" id="checkoutModal">
     <div class="checkout-content">
-        <div class="checkout-header">
-            <h2><i class="fas fa-clipboard-list"></i> Complete Your Order</h2>
-            <span class="close-checkout" id="closeCheckoutBtn">&times;</span>
-        </div>
+        <div class="checkout-header"><h2><i class="fas fa-clipboard-list"></i> Complete Your Order</h2><span class="close-checkout" id="closeCheckoutBtn">&times;</span></div>
         <div class="checkout-body">
             <form id="checkoutForm">
                 <h3>Delivery Information</h3>
-                <div class="form-group">
-                    <label>Full Name *</label>
-                    <input type="text" id="fullName" required placeholder="e.g., Akua Mensah">
-                </div>
-                <div class="form-group">
-                    <label>Phone Number *</label>
-                    <input type="tel" id="phone" required placeholder="024XXXXXXX">
-                </div>
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="email" placeholder="akua@example.com">
-                </div>
+                <div class="form-group"><label>Full Name *</label><input type="text" id="fullName" required placeholder="e.g., Akua Mensah"></div>
+                <div class="form-group"><label>Phone Number *</label><input type="tel" id="phone" required placeholder="024XXXXXXX"></div>
+                <div class="form-group"><label>Email Address</label><input type="email" id="email" placeholder="akua@example.com"></div>
                 <div class="form-group">
                     <label>Delivery Region *</label>
                     <select id="region" required>
                         <option value="">Select Region</option>
-                        <option value="Greater Accra">Greater Accra</option>
-                        <option value="Ashanti">Ashanti</option>
-                        <option value="Western">Western</option>
-                        <option value="Eastern">Eastern</option>
-                        <option value="Central">Central</option>
-                        <option value="Volta">Volta</option>
-                        <option value="Northern">Northern</option>
-                        <option value="Upper East">Upper East</option>
-                        <option value="Upper West">Upper West</option>
-                        <option value="Bono">Bono</option>
-                        <option value="Ahafo">Ahafo</option>
-                        <option value="Savannah">Savannah</option>
-                        <option value="North East">North East</option>
-                        <option value="Oti">Oti</option>
-                        <option value="Western North">Western North</option>
+                        <option value="Greater Accra">Greater Accra</option><option value="Ashanti">Ashanti</option><option value="Western">Western</option>
+                        <option value="Eastern">Eastern</option><option value="Central">Central</option><option value="Volta">Volta</option>
+                        <option value="Northern">Northern</option><option value="Upper East">Upper East</option><option value="Upper West">Upper West</option>
+                        <option value="Bono">Bono</option><option value="Ahafo">Ahafo</option><option value="Savannah">Savannah</option>
+                        <option value="North East">North East</option><option value="Oti">Oti</option><option value="Western North">Western North</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Delivery Address *</label>
-                    <textarea id="address" rows="2" required placeholder="Street name, house number, landmark"></textarea>
-                </div>
+                <div class="form-group"><label>Delivery Address *</label><textarea id="address" rows="2" required placeholder="Street name, house number, landmark"></textarea></div>
                 
                 <h3>Payment Method</h3>
                 <div class="payment-methods">
-                    <label class="payment-option">
-                        <input type="radio" name="payment" value="Mobile Money" checked>
-                        <i class="fas fa-mobile-alt"></i> Mobile Money (MoMo)
-                    </label>
-                    <label class="payment-option">
-                        <input type="radio" name="payment" value="Cash on Delivery">
-                        <i class="fas fa-money-bill-wave"></i> Cash on Delivery
-                    </label>
-                    <label class="payment-option">
-                        <input type="radio" name="payment" value="Card Payment">
-                        <i class="fas fa-credit-card"></i> Card Payment
-                    </label>
+                    <label class="payment-option"><input type="radio" name="payment" value="Mobile Money" checked><i class="fas fa-mobile-alt"></i> Mobile Money (MoMo)</label>
+                    <label class="payment-option"><input type="radio" name="payment" value="Cash on Delivery"><i class="fas fa-money-bill-wave"></i> Cash on Delivery</label>
+                    <label class="payment-option"><input type="radio" name="payment" value="Card Payment"><i class="fas fa-credit-card"></i> Card Payment</label>
                 </div>
                 
                 <div id="mobileMoneyDetails" class="payment-details">
-                    <div class="form-group">
-                        <label>Mobile Money Network</label>
-                        <select id="momoNetwork">
-                            <option value="MTN">MTN MoMo</option>
-                            <option value="Vodafone">Vodafone Cash</option>
-                            <option value="AirtelTigo">AirtelTigo Money</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>MoMo Number</label>
-                        <input type="tel" id="momoNumber" placeholder="024XXXXXXX">
-                    </div>
+                    <div class="form-group"><label>Mobile Money Network</label><select id="momoNetwork"><option value="MTN">MTN MoMo</option><option value="Vodafone">Vodafone Cash</option><option value="AirtelTigo">AirtelTigo Money</option></select></div>
+                    <div class="form-group"><label>MoMo Number</label><input type="tel" id="momoNumber" placeholder="024XXXXXXX"></div>
+                </div>
+                
+                <div id="cardDetails" class="payment-details" style="display:none;">
+                    <div class="form-group"><label>Card Number</label><input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"></div>
+                    <div class="form-row"><div class="form-group half"><label>Expiry Date</label><input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5"></div><div class="form-group half"><label>CVV</label><input type="password" id="cvv" placeholder="123" maxlength="4"></div></div>
+                    <div class="form-group"><label>Cardholder Name</label><input type="text" id="cardholderName" placeholder="Name on card"></div>
+                    <div class="card-icons"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-amex"></i></div>
                 </div>
                 
                 <div class="order-summary">
                     <h3>Order Summary</h3>
-                    <div class="summary-row">
-                        <span>Subtotal:</span>
-                        <span id="summarySubtotal">GH₵0.00</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Delivery Fee:</span>
-                        <span id="summaryDelivery">GH₵0.00</span>
-                    </div>
-                    <div class="summary-row total">
-                        <span>Total:</span>
-                        <span id="summaryTotal">GH₵0.00</span>
-                    </div>
+                    <div class="summary-row"><span>Subtotal:</span><span id="summarySubtotal">GH₵0.00</span></div>
+                    <div class="summary-row"><span>Delivery Fee:</span><span id="summaryDelivery">GH₵0.00</span></div>
+                    <div class="summary-row total"><span>Total:</span><span id="summaryTotal">GH₵0.00</span></div>
                 </div>
                 
                 <button type="submit" class="place-order-btn">Place Order <i class="fas fa-check-circle"></i></button>
@@ -188,7 +146,6 @@
 
 <div id="toastMsg" class="toast-msg">Item added to cart</div>
 
-<!-- Custom JavaScript -->
 <script src="js/script.js"></script>
 </body>
 </html>

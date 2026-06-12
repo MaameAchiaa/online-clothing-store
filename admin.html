@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MAAME'S CLOTHING LINE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: #faf7f2; }
+        .admin-nav { background: #1e1e2a; color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .admin-nav h2 { color: #c28a4c; }
+        .admin-container { padding: 2rem 5%; max-width: 1400px; margin: 0 auto; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .stat-card h3 { font-size: 2rem; color: #c28a4c; }
+        .orders-table { background: white; border-radius: 16px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f5f5f5; font-weight: 600; }
+        .status-pending { background: #fff3e0; color: #e65100; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; display: inline-block; }
+        .status-processing { background: #e3f2fd; color: #1565c0; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; display: inline-block; }
+        .status-shipped { background: #e8f5e9; color: #2e7d32; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; display: inline-block; }
+        .status-delivered { background: #c8e6c9; color: #1b5e20; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; display: inline-block; }
+        .status-cancelled { background: #ffebee; color: #c62828; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; display: inline-block; }
+        .logout-btn { background: #c28a4c; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; color: white; }
+        .refresh-btn { background: #2196f3; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; color: white; margin-right: 0.5rem; }
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #faf7f2; }
+        .login-box { background: white; padding: 2rem; border-radius: 24px; width: 350px; text-align: center; }
+        .login-box input { width: 100%; padding: 0.8rem; margin: 0.5rem 0; border: 1px solid #ddd; border-radius: 12px; }
+        .login-box button { background: #1e2a36; color: white; padding: 0.8rem; width: 100%; border: none; border-radius: 60px; cursor: pointer; }
+        @media (max-width: 768px) { th, td { font-size: 0.7rem; padding: 0.5rem; } .stat-card h3 { font-size: 1.3rem; } }
+    </style>
+</head>
+<body>
+<div id="adminApp"></div>
+<script>
+    const ADMIN_PASSWORD = "maame123";
+    
+    function renderLogin() {
+        document.getElementById("adminApp").innerHTML = `
+            <div class="login-container">
+                <div class="login-box">
+                    <h2><i class="fas fa-lock"></i> Admin Login</h2>
+                    <input type="password" id="adminPassword" placeholder="Enter admin password">
+                    <button onclick="login()">Login</button>
+                </div>
+            </div>
+        `;
+    }
+    
+    function login() {
+        const pwd = document.getElementById("adminPassword").value;
+        if (pwd === ADMIN_PASSWORD) {
+            localStorage.setItem("admin_logged_in", "true");
+            renderDashboard();
+        } else {
+            alert("Incorrect password!");
+        }
+    }
+    
+    function logout() {
+        localStorage.removeItem("admin_logged_in");
+        renderLogin();
+    }
+    
+    function refreshData() {
+        renderDashboard();
+    }
+    
+    function updateOrderStatus(orderId, newStatus) {
+        let orders = JSON.parse(localStorage.getItem("maames_orders") || "[]");
+        const order = orders.find(o => o.orderId === orderId);
+        if (order) { order.status = newStatus; localStorage.setItem("maames_orders", JSON.stringify(orders)); }
+        renderDashboard();
+    }
+    
+    function getStatusClass(status) {
+        const classes = {
+            'Pending': 'status-pending', 'Processing': 'status-processing',
+            'Shipped': 'status-shipped', 'Delivered': 'status-delivered', 'Cancelled': 'status-cancelled'
+        };
+        return classes[status] || 'status-pending';
+    }
+    
+    function renderDashboard() {
+        let orders = JSON.parse(localStorage.getItem("maames_orders") || "[]");
+        const totalOrders = orders.length;
+        const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
+        const pendingOrders = orders.filter(o => o.status === "Pending").length;
+        
+        document.getElementById("adminApp").innerHTML = `
+            <div class="admin-nav">
+                <h2><i class="fas fa-store"></i> MAAME'S Admin</h2>
+                <div><button class="refresh-btn" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+            </div>
+            <div class="admin-container">
+                <div class="stats">
+                    <div class="stat-card"><i class="fas fa-shopping-cart"></i><h3>${totalOrders}</h3><p>Total Orders</p></div>
+                    <div class="stat-card"><i class="fas fa-cedi-sign"></i><h3>GH₵${totalRevenue.toFixed(2)}</h3><p>Revenue</p></div>
+                    <div class="stat-card"><i class="fas fa-clock"></i><h3>${pendingOrders}</h3><p>Pending</p></div>
+                </div>
+                <div class="orders-table">
+                    <table>
+                        <thead><tr><th>Order #</th><th>Date</th><th>Customer</th><th>Phone</th><th>Region</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody>
+                            ${orders.length === 0 ? '<tr><td colspan="10" style="text-align:center;">No orders yet</td></tr>' : orders.slice().reverse().map(order => `
+                                <tr>
+                                    <td>#${order.orderId}</td>
+                                    <td>${new Date(order.date).toLocaleDateString()}</td>
+                                    <td>${order.customer}</td>
+                                    <td>${order.phone}</td>
+                                    <td>${order.region}</td>
+                                    <td><small>${order.items.map(i => `${i.name} x${i.quantity}`).join(', ')}</small></td>
+                                    <td>GH₵${order.total.toFixed(2)}</td>
+                                    <td>${order.payment}</td>
+                                    <td><span class="${getStatusClass(order.status || 'Pending')}">${order.status || 'Pending'}</span></td>
+                                    <td><select onchange="updateOrderStatus('${order.orderId}', this.value)" style="padding:0.3rem; border-radius:8px;">
+                                        <option ${order.status === "Pending" ? "selected" : ""}>Pending</option>
+                                        <option ${order.status === "Processing" ? "selected" : ""}>Processing</option>
+                                        <option ${order.status === "Shipped" ? "selected" : ""}>Shipped</option>
+                                        <option ${order.status === "Delivered" ? "selected" : ""}>Delivered</option>
+                                        <option ${order.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
+                                    </select></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (localStorage.getItem("admin_logged_in") === "true") { renderDashboard(); } else { renderLogin(); }
+</script>
+</body>
+</html>
