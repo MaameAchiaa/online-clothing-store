@@ -1,0 +1,244 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Tests - MAAME'S CLOTHING LINE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: #faf7f2; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #c28a4c; margin-bottom: 2rem; }
+        .test-summary { background: #1e1e2a; color: white; padding: 1rem; border-radius: 12px; margin-bottom: 2rem; }
+        .test-group { background: white; border-radius: 12px; margin-bottom: 1.5rem; overflow: hidden; }
+        .test-group h2 { background: #e9dfce; padding: 1rem; font-size: 1.2rem; }
+        .test-case { padding: 0.8rem 1rem; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 1rem; }
+        .test-case.passed { background: #e8f5e9; }
+        .test-case.failed { background: #ffebee; }
+        .status { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .status.passed { background: #27ae60; color: white; }
+        .status.failed { background: #c62828; color: white; }
+        .test-name { flex: 1; font-family: monospace; }
+        .test-message { color: #666; font-size: 0.85rem; margin-top: 0.3rem; }
+        button { background: #c28a4c; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 60px; cursor: pointer; margin-bottom: 1rem; }
+        .progress-bar { height: 8px; background: #ddd; border-radius: 4px; overflow: hidden; margin-top: 1rem; }
+        .progress-fill { height: 100%; background: #27ae60; width: 0%; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Unit Tests - MAAME'S CLOTHING LINE</h1>
+        <div class="test-summary" id="testSummary">
+            <div id="summaryText">Running tests...</div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <button onclick="runAllTests()">▶ Run All Tests</button>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        // Mock product database for testing
+        const testProducts = [
+            { id: 1, name: "Test Shirt", category: "men", priceUSD: 10, priceGHS: 115, stock: 10 },
+            { id: 2, name: "Test Dress", category: "women", priceUSD: 20, priceGHS: 230, stock: 5 },
+            { id: 3, name: "Test Bag", category: "accessories", priceUSD: 5, priceGHS: 57.5, stock: 0 }
+        ];
+
+        let testResults = [];
+        let totalTests = 0;
+        let passedTests = 0;
+
+        // Test assertion helper
+        function assert(condition, message, testName) {
+            totalTests++;
+            const passed = !!condition;
+            if (passed) passedTests++;
+            testResults.push({ name: testName, passed, message: condition ? "✓ Passed" : message });
+            return passed;
+        }
+
+        // Mock functions for testing
+        function formatGHS(amount) { return `GH₵${amount.toFixed(2)}`; }
+        
+        function generateOrderId() { return Math.floor(100000 + Math.random() * 900000).toString(); }
+        
+        function validatePhone(phone) {
+            return phone && phone.length >= 9 && /^[0-9]{9,}$/.test(phone);
+        }
+        
+        function validateCard(cardNum, expiry, cvv) {
+            const cleanCard = cardNum?.replace(/\s/g, '');
+            if (!cleanCard || cleanCard.length < 15) return false;
+            if (!expiry || !expiry.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) return false;
+            if (!cvv || cvv.length < 3) return false;
+            return true;
+        }
+        
+        function calculateDeliveryFee(region) {
+            const fees = { "Greater Accra": 20, "Ashanti": 30, "Northern": 50 };
+            return fees[region] || 40;
+        }
+        
+        function addToCartLogic(cart, product, quantity = 1) {
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                if (existing.quantity + quantity > product.stock) return false;
+                existing.quantity += quantity;
+            } else {
+                if (quantity > product.stock) return false;
+                cart.push({ id: product.id, name: product.name, quantity, price: product.priceGHS });
+            }
+            return true;
+        }
+        
+        function deductStock(products, orderItems) {
+            orderItems.forEach(item => {
+                const product = products.find(p => p.id === item.id);
+                if (product) product.stock -= item.quantity;
+            });
+        }
+
+        // Unit Tests
+        function testFormatGHS() {
+            assert(formatGHS(100) === "GH₵100.00", "Format GHS with whole number", "formatGHS(100)");
+            assert(formatGHS(99.99) === "GH₵99.99", "Format GHS with decimals", "formatGHS(99.99)");
+            assert(formatGHS(0) === "GH₵0.00", "Format GHS with zero", "formatGHS(0)");
+        }
+        
+        function testGenerateOrderId() {
+            const id1 = generateOrderId();
+            const id2 = generateOrderId();
+            assert(id1.length === 6, "Order ID has 6 digits", "Order ID length");
+            assert(/^\d+$/.test(id1), "Order ID contains only digits", "Order ID format");
+            assert(id1 !== id2, "Order IDs are unique", "Order ID uniqueness");
+        }
+        
+        function testValidatePhone() {
+            assert(validatePhone("0241234567") === true, "Valid Ghana phone number", "validatePhone(0241234567)");
+            assert(validatePhone("12345") === false, "Too short phone number", "validatePhone(12345)");
+            assert(validatePhone("") === false, "Empty phone number", "validatePhone(empty)");
+            assert(validatePhone("0551234567") === true, "Valid MTN number", "validatePhone(0551234567)");
+        }
+        
+        function testValidateCard() {
+            assert(validateCard("1234567890123456", "12/25", "123") === true, "Valid card details", "validateCard(valid)");
+            assert(validateCard("1234", "12/25", "123") === false, "Card number too short", "validateCard(short)");
+            assert(validateCard("1234567890123456", "13/25", "123") === false, "Invalid expiry month", "validateCard(bad expiry)");
+            assert(validateCard("1234567890123456", "12/25", "12") === false, "CVV too short", "validateCard(short CVV)");
+        }
+        
+        function testDeliveryFee() {
+            assert(calculateDeliveryFee("Greater Accra") === 20, "Greater Accra fee", "deliveryFee(Greater Accra)");
+            assert(calculateDeliveryFee("Ashanti") === 30, "Ashanti fee", "deliveryFee(Ashanti)");
+            assert(calculateDeliveryFee("Northern") === 50, "Northern fee", "deliveryFee(Northern)");
+            assert(calculateDeliveryFee("Unknown") === 40, "Default fee", "deliveryFee(default)");
+        }
+        
+        function testAddToCart() {
+            let cart = [];
+            const product = { id: 1, name: "Test", priceGHS: 100, stock: 5 };
+            
+            const result1 = addToCartLogic(cart, product, 3);
+            assert(result1 === true, "Add within stock limit", "addToCartLogic(within stock)");
+            assert(cart.length === 1 && cart[0].quantity === 3, "Cart updated correctly", "Cart quantity check");
+            
+            const result2 = addToCartLogic(cart, product, 3);
+            assert(result2 === false, "Exceeds stock limit", "addToCartLogic(exceeds stock)");
+            
+            const product2 = { id: 2, name: "Test2", priceGHS: 200, stock: 0 };
+            const result3 = addToCartLogic(cart, product2, 1);
+            assert(result3 === false, "Add out of stock product", "addToCartLogic(out of stock)");
+        }
+        
+        function testDeductStock() {
+            let products = JSON.parse(JSON.stringify(testProducts));
+            const orderItems = [{ id: 1, quantity: 2 }, { id: 2, quantity: 1 }];
+            deductStock(products, orderItems);
+            assert(products[0].stock === 8, "Stock deducted correctly", "deductStock(product1)");
+            assert(products[1].stock === 4, "Stock deducted correctly", "deductStock(product2)");
+            assert(products[2].stock === 0, "Out of stock unchanged", "deductStock(out of stock)");
+        }
+        
+        function testPriceConversion() {
+            const USD_TO_GHS = 11.50;
+            const priceUSD = 10;
+            const priceGHS = priceUSD * USD_TO_GHS;
+            assert(priceGHS === 115, "USD to GHS conversion", "price conversion");
+        }
+        
+        function testRegionSelection() {
+            const regions = ["Greater Accra", "Ashanti", "Western", "Eastern", "Central", "Volta", "Northern", "Upper East", "Upper West"];
+            assert(regions.length === 9, "All regions available", "region count");
+            assert(regions.includes("Greater Accra"), "Greater Accra in list", "region includes GA");
+        }
+        
+        function testPaymentMethods() {
+            const methods = ["Mobile Money", "Cash on Delivery", "Card Payment"];
+            assert(methods.length === 3, "Three payment methods", "payment methods count");
+            assert(methods.includes("Card Payment"), "Card payment available", "card payment included");
+        }
+
+        // Run all tests
+        function runAllTests() {
+            testResults = [];
+            totalTests = 0;
+            passedTests = 0;
+            
+            testFormatGHS();
+            testGenerateOrderId();
+            testValidatePhone();
+            testValidateCard();
+            testDeliveryFee();
+            testAddToCart();
+            testDeductStock();
+            testPriceConversion();
+            testRegionSelection();
+            testPaymentMethods();
+            
+            displayResults();
+        }
+        
+        function displayResults() {
+            const resultsDiv = document.getElementById("testResults");
+            const summaryDiv = document.getElementById("summaryText");
+            const progressFill = document.getElementById("progressFill");
+            
+            const percentage = (passedTests / totalTests) * 100;
+            progressFill.style.width = `${percentage}%`;
+            
+            summaryDiv.innerHTML = `
+                <strong>✅ Passed: ${passedTests}</strong> | 
+                ❌ Failed: ${totalTests - passedTests} | 
+                📊 Total: ${totalTests} | 
+                🎯 Pass Rate: ${percentage.toFixed(1)}%
+            `;
+            
+            // Group tests by category
+            const grouped = {};
+            testResults.forEach(test => {
+                const category = test.name.split('(')[0];
+                if (!grouped[category]) grouped[category] = [];
+                grouped[category].push(test);
+            });
+            
+            resultsDiv.innerHTML = Object.entries(grouped).map(([category, tests]) => `
+                <div class="test-group">
+                    <h2>📋 ${category}</h2>
+                    ${tests.map(test => `
+                        <div class="test-case ${test.passed ? 'passed' : 'failed'}">
+                            <div class="status ${test.passed ? 'passed' : 'failed'}">${test.passed ? '✓' : '✗'}</div>
+                            <div class="test-name">${test.name}</div>
+                            <div class="test-message">${test.message}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+        
+        // Auto-run on load
+        runAllTests();
+    </script>
+</body>
+</html>

@@ -38,6 +38,7 @@ body {
 .logo span {
     color: #c28a4c;
     background: none;
+    background-clip: unset;
     -webkit-background-clip: unset;
 }
 

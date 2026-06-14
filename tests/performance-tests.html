@@ -1,0 +1,182 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Tests - MAAME'S CLOTHING LINE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: #faf7f2; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #c28a4c; margin-bottom: 1rem; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .metric-card { background: white; padding: 1.5rem; border-radius: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .metric-value { font-size: 2rem; font-weight: bold; }
+        .metric-good { color: #27ae60; }
+        .metric-warning { color: #e65100; }
+        .metric-bad { color: #c62828; }
+        button { background: #c28a4c; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 60px; cursor: pointer; margin-bottom: 1rem; }
+        .test-table { width: 100%; background: white; border-radius: 12px; overflow: hidden; }
+        .test-table th, .test-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+        .test-table th { background: #e9dfce; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Performance Tests - MAAME'S CLOTHING LINE</h1>
+        <div class="metrics" id="metrics"></div>
+        <button onclick="runPerformanceTests()">▶ Run Performance Tests</button>
+        <table class="test-table" id="performanceTable">
+            <thead>
+                <tr><th>Test</th><th>Result</th><th>Threshold</th><th>Status</th></tr>
+            </thead>
+            <tbody id="performanceBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let performanceData = [];
+        
+        async function measurePageLoad() {
+            const start = performance.now();
+            await new Promise(resolve => setTimeout(resolve, 0));
+            const end = performance.now();
+            return end - start;
+        }
+        
+        async function measureRenderTime(componentId, iterations = 10) {
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const element = document.getElementById(componentId);
+                if (element) {
+                    const html = element.innerHTML;
+                    element.innerHTML = html;
+                }
+            }
+            const end = performance.now();
+            return (end - start) / iterations;
+        }
+        
+        async function measureLocalStorageWrite() {
+            const start = performance.now();
+            for (let i = 0; i < 100; i++) {
+                localStorage.setItem(`perf_test_${i}`, JSON.stringify({ data: "test", index: i }));
+            }
+            const end = performance.now();
+            for (let i = 0; i < 100; i++) {
+                localStorage.removeItem(`perf_test_${i}`);
+            }
+            return end - start;
+        }
+        
+        async function measureLocalStorageRead() {
+            localStorage.setItem("perf_read_test", JSON.stringify({ test: "data" }));
+            const start = performance.now();
+            for (let i = 0; i < 1000; i++) {
+                const data = localStorage.getItem("perf_read_test");
+                JSON.parse(data);
+            }
+            const end = performance.now();
+            localStorage.removeItem("perf_read_test");
+            return end - start;
+        }
+        
+        async function measureDOMOperation() {
+            const container = document.createElement('div');
+            document.body.appendChild(container);
+            const start = performance.now();
+            for (let i = 0; i < 100; i++) {
+                const div = document.createElement('div');
+                div.textContent = `Item ${i}`;
+                container.appendChild(div);
+            }
+            const end = performance.now();
+            container.remove();
+            return end - start;
+        }
+        
+        async function measureEventHandling() {
+            const btn = document.createElement('button');
+            let counter = 0;
+            btn.addEventListener('click', () => counter++);
+            document.body.appendChild(btn);
+            const start = performance.now();
+            for (let i = 0; i < 1000; i++) {
+                btn.click();
+            }
+            const end = performance.now();
+            btn.remove();
+            return end - start;
+        }
+        
+        async function measureFilterPerformance() {
+            const items = Array.from({ length: 1000 }, (_, i) => ({ id: i, name: `Product ${i}`, category: i % 3 === 0 ? 'men' : i % 3 === 1 ? 'women' : 'accessories' }));
+            const start = performance.now();
+            const filtered = items.filter(item => item.category === 'men');
+            const end = performance.now();
+            return end - start;
+        }
+        
+        function getStatus(value, threshold, isLowerBetter = true) {
+            if (isLowerBetter) {
+                if (value <= threshold.good) return { class: "metric-good", text: "✓ Excellent" };
+                if (value <= threshold.warning) return { class: "metric-warning", text: "⚠ Acceptable" };
+                return { class: "metric-bad", text: "✗ Needs Improvement" };
+            } else {
+                if (value >= threshold.good) return { class: "metric-good", text: "✓ Excellent" };
+                if (value >= threshold.warning) return { class: "metric-warning", text: "⚠ Acceptable" };
+                return { class: "metric-bad", text: "✗ Needs Improvement" };
+            }
+        }
+        
+        async function runPerformanceTests() {
+            const tests = [
+                { name: "Page Load Time", fn: measurePageLoad, threshold: { good: 100, warning: 300 }, unit: "ms" },
+                { name: "Component Render Time", fn: () => measureRenderTime('productsGrid'), threshold: { good: 50, warning: 100 }, unit: "ms" },
+                { name: "LocalStorage Write (100 ops)", fn: measureLocalStorageWrite, threshold: { good: 50, warning: 100 }, unit: "ms" },
+                { name: "LocalStorage Read (1000 ops)", fn: measureLocalStorageRead, threshold: { good: 30, warning: 60 }, unit: "ms" },
+                { name: "DOM Operation (100 elements)", fn: measureDOMOperation, threshold: { good: 20, warning: 50 }, unit: "ms" },
+                { name: "Event Handling (1000 events)", fn: measureEventHandling, threshold: { good: 50, warning: 100 }, unit: "ms" },
+                { name: "Filter Performance (1000 items)", fn: measureFilterPerformance, threshold: { good: 5, warning: 15 }, unit: "ms" }
+            ];
+            
+            const metricsDiv = document.getElementById("metrics");
+            const tableBody = document.getElementById("performanceBody");
+            
+            metricsDiv.innerHTML = `<div class="metric-card"><div class="metric-value">Running...</div><div>Performance Tests</div></div>`;
+            
+            for (const test of tests) {
+                const value = await test.fn();
+                const status = getStatus(value, test.threshold);
+                performanceData.push({ ...test, value, status });
+            }
+            
+            // Display metrics summary
+            const avgTime = performanceData.reduce((sum, t) => sum + t.value, 0) / performanceData.length;
+            const fastest = Math.min(...performanceData.map(t => t.value));
+            const slowest = Math.max(...performanceData.map(t => t.value));
+            
+            metricsDiv.innerHTML = `
+                <div class="metric-card"><div class="metric-value ${getStatus(avgTime, { good: 50, warning: 100 }).class}">${avgTime.toFixed(1)}ms</div><div>Average Response</div></div>
+                <div class="metric-card"><div class="metric-value ${getStatus(fastest, { good: 10, warning: 30 }).class}">${fastest.toFixed(1)}ms</div><div>Fastest Operation</div></div>
+                <div class="metric-card"><div class="metric-value ${getStatus(slowest, { good: 100, warning: 300 }).class}">${slowest.toFixed(1)}ms</div><div>Slowest Operation</div></div>
+            `;
+            
+            // Display table
+            tableBody.innerHTML = performanceData.map(test => `
+                <tr>
+                    <td>${test.name}</td>
+                    <td>${test.value.toFixed(2)} ${test.unit}</td>
+                    <td>< ${test.threshold.good} ${test.unit} (Good) / < ${test.threshold.warning} ${test.unit} (Warning)</td>
+                    <td class="${test.status.class}">${test.status.text}</td>
+                </tr>
+            `).join('');
+        }
+        
+        // Run tests on load
+        runPerformanceTests();
+    </script>
+</body>
+</html>

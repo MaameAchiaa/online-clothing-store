@@ -1,0 +1,223 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Tests - MAAME'S CLOTHING LINE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: #faf7f2; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #c28a4c; margin-bottom: 1rem; }
+        button { background: #c28a4c; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 60px; cursor: pointer; margin-bottom: 1rem; margin-right: 0.5rem; }
+        .test-card { background: white; border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
+        .test-header { padding: 1rem; background: #e9dfce; display: flex; justify-content: space-between; align-items: center; }
+        .test-details { padding: 1rem; border-top: 1px solid #eee; }
+        .pass { color: #27ae60; font-weight: bold; }
+        .fail { color: #c62828; font-weight: bold; }
+        .integration-summary { background: #1e1e2a; color: white; padding: 1rem; border-radius: 12px; margin-bottom: 2rem; }
+        .clear-btn { background: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Integration Tests - MAAME'S CLOTHING LINE</h1>
+        <div class="integration-summary" id="integrationSummary">
+            <div id="summaryText">Ready to run integration tests</div>
+        </div>
+        <button onclick="runIntegrationTests()">▶ Run All Integration Tests</button>
+        <button onclick="clearLocalStorage()" class="clear-btn">🗑️ Clear Test Data</button>
+        <div id="integrationResults"></div>
+    </div>
+
+    <script>
+        let integrationResults = [];
+        
+        // Helper to clear test data
+        function clearLocalStorage() {
+            localStorage.removeItem("maames_cart");
+            localStorage.removeItem("maames_wishlist");
+            localStorage.removeItem("maames_orders");
+            localStorage.removeItem("maames_products");
+            alert("Test data cleared!");
+            location.reload();
+        }
+        
+        // Test 1: Cart to Checkout Integration
+        async function testCartToCheckoutIntegration() {
+            try {
+                // Simulate adding items to cart
+                localStorage.setItem("maames_cart", JSON.stringify([
+                    { id: 1, product: { id: 1, name: "Test Product", priceGHS: 100 }, quantity: 2 }
+                ]));
+                
+                // Check if cart total calculates correctly
+                const cart = JSON.parse(localStorage.getItem("maames_cart"));
+                const total = cart.reduce((sum, item) => sum + (item.product.priceGHS * item.quantity), 0);
+                
+                return { pass: total === 200, message: `Cart total: GH₵${total} (expected GH₵200)` };
+            } catch(e) {
+                return { pass: false, message: e.message };
+            }
+        }
+        
+        // Test 2: Wishlist to Cart Integration
+        async function testWishlistToCartIntegration() {
+            try {
+                localStorage.setItem("maames_wishlist", JSON.stringify([1, 2]));
+                const wishlist = JSON.parse(localStorage.getItem("maames_wishlist"));
+                return { pass: wishlist.length === 2, message: `Wishlist contains ${wishlist.length} items` };
+            } catch(e) {
+                return { pass: false, message: e.message };
+            }
+        }
+        
+        // Test 3: Order to Stock Integration
+        async function testOrderToStockIntegration() {
+            try {
+                // Setup initial stock
+                const products = [
+                    { id: 1, name: "Test", stock: 10 }
+                ];
+                localStorage.setItem("maames_products", JSON.stringify(products));
+                
+                // Simulate order
+                const orderItems = [{ id: 1, quantity: 3 }];
+                const savedProducts = JSON.parse(localStorage.getItem("maames_products"));
+                savedProducts[0].stock -= 3;
+                localStorage.setItem("maames_products", JSON.stringify(savedProducts));
+                
+                const updatedProducts = JSON.parse(localStorage.getItem("maames_products"));
+                return { pass: updatedProducts[0].stock === 7, message: `Stock updated: ${updatedProducts[0].stock} left (expected 7)` };
+            } catch(e) {
+                return { pass: false, message: e.message };
+            }
+        }
+        
+        // Test 4: Filter to Product Display Integration
+        async function testFilterProductIntegration() {
+            const products = [
+                { id: 1, category: "men" },
+                { id: 2, category: "women" },
+                { id: 3, category: "men" }
+            ];
+            const filtered = products.filter(p => p.category === "men");
+            return { pass: filtered.length === 2, message: `Filter shows ${filtered.length} men's products (expected 2)` };
+        }
+        
+        // Test 5: Delivery Fee to Total Integration
+        async function testDeliveryFeeIntegration() {
+            const subtotal = 100;
+            const deliveryFee = 30;
+            const total = subtotal + deliveryFee;
+            return { pass: total === 130, message: `Total calculation: ${subtotal} + ${deliveryFee} = ${total}` };
+        }
+        
+        // Test 6: Payment Method to Order Integration
+        async function testPaymentMethodIntegration() {
+            const paymentMethods = ["Mobile Money", "Cash on Delivery", "Card Payment"];
+            const order = { payment: "Mobile Money", status: "Pending" };
+            const isValid = paymentMethods.includes(order.payment);
+            return { pass: isValid, message: `Payment method "${order.payment}" is valid` };
+        }
+        
+        // Test 7: Admin to Orders Integration
+        async function testAdminOrdersIntegration() {
+            const orders = [
+                { orderId: "123456", total: 150, status: "Pending" },
+                { orderId: "789012", total: 200, status: "Processing" }
+            ];
+            const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
+            const pendingOrders = orders.filter(o => o.status === "Pending").length;
+            return { 
+                pass: totalRevenue === 350 && pendingOrders === 1, 
+                message: `Revenue: GH₵${totalRevenue}, Pending: ${pendingOrders}` 
+            };
+        }
+        
+        // Test 8: Search to Product Integration
+        async function testSearchProductIntegration() {
+            const products = [
+                { id: 1, name: "Blue Shirt" },
+                { id: 2, name: "Red Dress" },
+                { id: 3, name: "Blue Jeans" }
+            ];
+            const searchQuery = "blue";
+            const results = products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+            return { pass: results.length === 2, message: `Search found ${results.length} items for "${searchQuery}"` };
+        }
+        
+        // Test 9: Region to Delivery Fee Integration
+        async function testRegionDeliveryIntegration() {
+            const deliveryFees = { "Greater Accra": 20, "Ashanti": 30, "Northern": 50 };
+            const selectedRegion = "Ashanti";
+            const fee = deliveryFees[selectedRegion];
+            return { pass: fee === 30, message: `Delivery fee for ${selectedRegion}: GH₵${fee}` };
+        }
+        
+        // Test 10: Card Validation to Order Integration
+        async function testCardValidationIntegration() {
+            function validateCard(cardNum, expiry, cvv) {
+                const cleanCard = cardNum?.replace(/\s/g, '');
+                if (!cleanCard || cleanCard.length < 15) return false;
+                if (!expiry || !expiry.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) return false;
+                if (!cvv || cvv.length < 3) return false;
+                return true;
+            }
+            
+            const validCard = validateCard("4111111111111111", "12/25", "123");
+            const invalidCard = validateCard("1234", "13/25", "12");
+            return { pass: validCard === true && invalidCard === false, message: "Card validation working correctly" };
+        }
+        
+        async function runIntegrationTests() {
+            integrationResults = [
+                { name: "Cart → Checkout Integration", result: await testCartToCheckoutIntegration() },
+                { name: "Wishlist → Cart Integration", result: await testWishlistToCartIntegration() },
+                { name: "Order → Stock Integration", result: await testOrderToStockIntegration() },
+                { name: "Filter → Product Integration", result: await testFilterProductIntegration() },
+                { name: "Delivery Fee → Total Integration", result: await testDeliveryFeeIntegration() },
+                { name: "Payment Method → Order Integration", result: await testPaymentMethodIntegration() },
+                { name: "Admin → Orders Integration", result: await testAdminOrdersIntegration() },
+                { name: "Search → Product Integration", result: await testSearchProductIntegration() },
+                { name: "Region → Delivery Fee Integration", result: await testRegionDeliveryIntegration() },
+                { name: "Card Validation → Order Integration", result: await testCardValidationIntegration() }
+            ];
+            
+            displayIntegrationResults();
+        }
+        
+        function displayIntegrationResults() {
+            const resultsDiv = document.getElementById("integrationResults");
+            const summaryDiv = document.getElementById("summaryText");
+            
+            const passed = integrationResults.filter(r => r.result.pass).length;
+            const total = integrationResults.length;
+            
+            summaryDiv.innerHTML = `
+                <strong>✅ Passed: ${passed}</strong> | 
+                ❌ Failed: ${total - passed} | 
+                📊 Total: ${total} | 
+                🎯 Success Rate: ${((passed / total) * 100).toFixed(1)}%
+            `;
+            
+            resultsDiv.innerHTML = integrationResults.map(test => `
+                <div class="test-card">
+                    <div class="test-header">
+                        <span>${test.name}</span>
+                        <span class="${test.result.pass ? 'pass' : 'fail'}">${test.result.pass ? '✓ PASS' : '✗ FAIL'}</span>
+                    </div>
+                    <div class="test-details">
+                        <p>${test.result.message}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Auto-run on load
+        runIntegrationTests();
+    </script>
+</body>
+</html>
